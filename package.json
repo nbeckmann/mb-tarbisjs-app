@@ -2,11 +2,9 @@
   "name": "mb-tabrisjs-app",
   "version": "0.1.0",
   "main": "modellberchnung.js",
-  "private": true,
-  "scripts": {
-    "start": "http-server -c-1 -d false"
-  },
   "dependencies": {
-    "tabris": "^1.10.0"
+    "tabris": "^1.10.0",
+	"promise": "^6.1.0",
+    "whatwg-fetch": "^0.7.0"
   }
 }
