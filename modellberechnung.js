@@ -83,7 +83,7 @@ panelLaufzeit.append(displayLaufzeit);
 panelLaufzeit.appendTo(page);
 
 var buttonBerechnen = new tabris.Button({
-  layoutData: {width: 100, left: 10, right: 10, top: "prev() 10"},
+  layoutData: {left: 10, right: 10, top: "prev() 10"},
   alignment: "center",
   font: "18px sans-serif",
   id: "buttonBerechnen",
@@ -154,15 +154,28 @@ function getMBR(){
   var init = {method: 'GET'};
   var url = 'https://raw.githubusercontent.com/nbeckmann/mb/master/result.json';
   var request = new Request(url, init);
-  fetch(request).then(function(response){
+  console.info("Request send");
+    console.debug(JSON.stringify(request.headers.map));
+    console.debug(request);
+  fetch(request).then(function(response){    
+    if(response.ok){
+      console.info("Response: Status:" + response.status + "; StatusText:" + 		response.statusText);
+      console.debug(response);
     return response.json(); 
+    }else{
+      console.error("Response: Status:" + response.status + "; StatusText:" + 		response.statusText);
+      console.log(response);
+    }
     
   }).catch(function (err){
     buttonBerechnen.set("enabled", true);
+    console.error(err);
     createErrorText("Fehler: " + err || "Fehler beim empfangen der Ergebnisse!");
   }).then(function (json){
-    var result = json["data"]["items"][0]["result"];
-    
+    if(json["data"]["error"] == true){
+      console.error("errorMessage:" + json["data"]["errorMessage"]);
+    }else{
+     var result = json["data"]["items"][0]["result"];
     displayZins.set("text", result["Zinssatz gesamt"] + " %");
     labelZins.appendTo(panelErgebnisZins);
     displayZins.appendTo(panelErgebnisZins);
@@ -172,6 +185,8 @@ function getMBR(){
     labelGuthaben.appendTo(panelErgebnisGuthaben);
     displayGuthaben.appendTo(panelErgebnisGuthaben);
     panelErgebnisGuthaben.appendTo(panelErgebnis);
+    }
+    
     buttonBerechnen.set("enabled", true);
 
   })
@@ -207,16 +222,31 @@ function postMBR(){
   var init = {method: 'POST',
              headers: headers,
              body: JSON.stringify(data)}
-  var url = 'https://pt-v00-ent.s-hbci.de/uca/rest/isp'
+  var url = 'https://pt-v00-ent.s-hbci.de:443/uca/rest/isp'
   var request = new Request(url, init);
-  fetch(request).then(function(response){
-    return response.json();
+  	console.info("Request send");
+    console.debug(JSON.stringify(request.headers.map));
+    console.debug(request);
+    fetch(request).then(function(response){
+      
+    if(response.ok){
+      console.info("Response: Status:" + response.status + "; StatusText:" + 		response.statusText);
+      console.debug(response);
+    return response.json(); 
+    }else{
+      console.error("Response: Status:" + response.status + "; StatusText:" + 		response.statusText);
+      console.log(response);
+    }
+    
   }).catch(function (err){
     buttonBerechnen.set("enabled", true);
+      console.error(err);
     createErrorText("Fehler: " + err || "Fehler beim empfangen der Ergebnisse!");
   }).then(function (json){
-    var result = json["data"]["items"][0]["result"];
-    
+    if(json["data"]["error"] == true){
+      console.error("errorMessage:" + json["data"]["errorMessage"]);
+    }else{
+     var result = json["data"]["items"][0]["result"];
     displayZins.set("text", result["Zinssatz gesamt"] + " %");
     labelZins.appendTo(panelErgebnisZins);
     displayZins.appendTo(panelErgebnisZins);
@@ -226,12 +256,15 @@ function postMBR(){
     labelGuthaben.appendTo(panelErgebnisGuthaben);
     displayGuthaben.appendTo(panelErgebnisGuthaben);
     panelErgebnisGuthaben.appendTo(panelErgebnis);
+    }
+    
     buttonBerechnen.set("enabled", true);
+
   })
 };
 
 buttonBerechnen.on("select", function(button){
-  postMBR();
+  getMBR();
 });
 sliderRate.on("change:selection", function(slider, selection) {
   displayRate.set("text", selection + " €");
