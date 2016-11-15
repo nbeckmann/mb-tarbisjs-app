@@ -1,7 +1,7 @@
 tabris.ui.set("background", "red");
 
 tabris.ui.on("change:activePage", function(){
-  getMBR();
+  postMBR();
 });
 
 var page = new tabris.Page({
@@ -207,7 +207,7 @@ function postMBR(){
   var init = {method: 'POST',
              headers: headers,
              body: JSON.stringify(data)}
-  var url = 'https://pt-v00-ent.s-hbci.de:50001/uca/rest/isp'
+  var url = 'https://pt-v00-ent.s-hbci.de/uca/rest/isp'
   var request = new Request(url, init);
   fetch(request).then(function(response){
     return response.json();
@@ -231,7 +231,7 @@ function postMBR(){
 };
 
 buttonBerechnen.on("select", function(button){
-  getMBR();
+  postMBR();
 });
 sliderRate.on("change:selection", function(slider, selection) {
   displayRate.set("text", selection + " €");
@@ -242,4 +242,5 @@ sliderLaufzeit.on("change:selection", function(slider, selection) {
 });
 
 page.open();
+      
       
