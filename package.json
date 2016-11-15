@@ -1,7 +1,7 @@
 {
   "name": "mb-tabrisjs-app",
   "version": "0.1.0",
-  "main": "modellberchnung.js",
+  "main": "modellberechnung.js",
   "dependencies": {
     "tabris": "^1.10.0",
 	"promise": "^6.1.0",
