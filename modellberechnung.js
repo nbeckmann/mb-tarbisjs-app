@@ -222,7 +222,7 @@ function postMBR(){
   var init = {method: 'POST',
              headers: headers,
              body: JSON.stringify(data)}
-  var url = 'https://pt-v00-ent.s-hbci.de:443/uca/rest/isp'
+  var url = "https://pt-v00-ed.s-hbci.de/uca/rest/isp";
   var request = new Request(url, init);
   	console.info("Request send");
     console.debug(JSON.stringify(request.headers.map));
