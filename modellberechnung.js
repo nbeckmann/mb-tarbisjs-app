@@ -147,50 +147,14 @@ function createErrorText (text){
   }).appendTo(page);
 };
 
-function getMBR(){
-  page.children(".errorText").dispose();
-  buttonBerechnen.set("enabled", false);
-  
-  var init = {method: 'GET'};
-  var url = 'https://raw.githubusercontent.com/nbeckmann/mb/master/result.json';
-  var request = new Request(url, init);
-  console.info("Request send");
-    console.debug(JSON.stringify(request.headers.map));
-    console.debug(request);
-  fetch(request).then(function(response){    
-    if(response.ok){
-      console.info("Response: Status:" + response.status + "; StatusText:" + 		response.statusText);
-      console.debug(response);
-    return response.json(); 
-    }else{
-      console.error("Response: Status:" + response.status + "; StatusText:" + 		response.statusText);
-      console.log(response);
-    }
-    
-  }).catch(function (err){
-    buttonBerechnen.set("enabled", true);
-    console.error(err);
-    createErrorText("Fehler: " + err || "Fehler beim empfangen der Ergebnisse!");
-  }).then(function (json){
-    if(json["data"]["error"] == true){
-      console.error("errorMessage:" + json["data"]["errorMessage"]);
-    }else{
-     var result = json["data"]["items"][0]["result"];
-    displayZins.set("text", result["Zinssatz gesamt"] + " %");
-    labelZins.appendTo(panelErgebnisZins);
-    displayZins.appendTo(panelErgebnisZins);
-    panelErgebnisZins.appendTo(panelErgebnis);
-    
-    displayGuthaben.set("text", result["Gesamtguthaben"] + " €");
-    labelGuthaben.appendTo(panelErgebnisGuthaben);
-    displayGuthaben.appendTo(panelErgebnisGuthaben);
-    panelErgebnisGuthaben.appendTo(panelErgebnis);
-    }
-    
-    buttonBerechnen.set("enabled", true);
 
+ function timeout(ms, promise) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(function() {
+      reject(new Error("timeout"));
+    }, ms)
+    promise.then(resolve, reject);
   })
-  
 };
 
 
@@ -206,8 +170,8 @@ function postMBR(){
 	"blz":94059421,
 	"context":"137353393383500000000000",
 	"params":{
-		"laufzeit":laufzeit,
-		"rate": rate
+		"laufzeit":"" + laufzeit + "",
+		"rate": "" + rate + ""
 	},
 	"service":"38871ca4-32c4-431d-bdad-e3f0b3770850",
 	"session":"Dialog-ID",
@@ -222,12 +186,12 @@ function postMBR(){
   var init = {method: 'POST',
              headers: headers,
              body: JSON.stringify(data)}
-  var url = "https://pt-v00-ed.s-hbci.de/uca/rest/isp";
+  var url = 'https://pt-v00-ed.s-hbci.de/uca/rest/isp'
   var request = new Request(url, init);
   	console.info("Request send");
     console.debug(JSON.stringify(request.headers.map));
     console.debug(request);
-    fetch(request).then(function(response){
+    timeout(30000,  fetch(request)).then(function(response){
       
     if(response.ok){
       console.info("Response: Status:" + response.status + "; StatusText:" + 		response.statusText);
@@ -241,18 +205,22 @@ function postMBR(){
   }).catch(function (err){
     buttonBerechnen.set("enabled", true);
       console.error(err);
-    createErrorText("Fehler: " + err || "Fehler beim empfangen der Ergebnisse!");
+    createErrorText(err || "Fehler beim empfangen der Ergebnisse!");
   }).then(function (json){
     if(json["data"]["error"] == true){
       console.error("errorMessage:" + json["data"]["errorMessage"]);
     }else{
      var result = json["data"]["items"][0]["result"];
-    displayZins.set("text", result["Zinssatz gesamt"] + " %");
+     var zinssatz =  result["Zinssatz gesamt"].trim();
+     var guthaben =  result["Gesamtguthaben"].trim();
+      console.log(zinssatz);
+      console.log(guthaben);
+    displayZins.set("text", zinssatz + " %");
     labelZins.appendTo(panelErgebnisZins);
     displayZins.appendTo(panelErgebnisZins);
     panelErgebnisZins.appendTo(panelErgebnis);
     
-    displayGuthaben.set("text", result["Gesamtguthaben"] + " €");
+    displayGuthaben.set("text", guthaben + " €");
     labelGuthaben.appendTo(panelErgebnisGuthaben);
     displayGuthaben.appendTo(panelErgebnisGuthaben);
     panelErgebnisGuthaben.appendTo(panelErgebnis);
@@ -264,7 +232,7 @@ function postMBR(){
 };
 
 buttonBerechnen.on("select", function(button){
-  getMBR();
+  postMBR();
 });
 sliderRate.on("change:selection", function(slider, selection) {
   displayRate.set("text", selection + " €");
@@ -275,5 +243,9 @@ sliderLaufzeit.on("change:selection", function(slider, selection) {
 });
 
 page.open();
+      
+      
+      
+      
       
       
